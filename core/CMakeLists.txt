@@ -25,6 +25,7 @@ option( SPIRIT_TEST_COVERAGE     "Build in debug with special flags for coverage
 option( SPIRIT_USE_CUDA          "Use CUDA to speed up certain parts of the code."         OFF )
 option( SPIRIT_USE_OPENMP        "Use OpenMP to speed up certain parts of the code."       OFF )
 option( SPIRIT_USE_THREADS       "Use std threads to speed up certain parts of the code."  OFF )
+option( SPIRIT_USE_LIKWID        "Use LIKWID perfctr.                              "       OFF )
 ### Set the scalar type used in the Spirit library
 set( SPIRIT_SCALAR_TYPE double )
 #############################################
@@ -214,6 +215,13 @@ if ( SPIRIT_USE_OPENMP )
 endif( )
 #############################################
 
+#if ( SPIRIT_USE_LIKWID )
+#  set( CMAKE_C_FLAGS          "${CMAKE_C_FLAGS}          -DLIKWID_PERFMON -L/opt/likwid/lib  -llikwid" )
+#  set( CMAKE_CXX_FLAGS        "${CMAKE_CXX_FLAGS}        -DLIKWID_PERFMON -L/opt/likwid/lib  -llikwid" )
+#  set( CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -L/opt/likwid/lib -llikwid" )
+#    add_definitions( -DSPIRIT_USE_LIKWID )
+#    message( STATUS ">> LIKWID found." )
+#  endif( )
 
 ######### Coverage ##########################
 if( SPIRIT_BUILD_TEST AND SPIRIT_TEST_COVERAGE )

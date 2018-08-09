@@ -9,6 +9,8 @@
 
 #include <fmt/format.h>
 
+#include <likwid.h>
+
 using namespace Utility;
 
 
@@ -202,7 +204,13 @@ State * State_Setup(const char * config_file, bool quiet) noexcept
         Log(Log_Level::All, Log_Sender::All, "    Number of Warnings: " + fmt::format("{}", Log_Get_N_Warnings(state)));
         Log(Log_Level::All, Log_Sender::All, "=====================================================");
         Log.Append_to_File();
-        
+
+        LIKWID_MARKER_INIT;
+                #pragma omp parallel
+                {
+                          LIKWID_MARKER_THREADINIT;
+                                      }
+
         // Return
         return state;
     }
@@ -233,6 +241,8 @@ try
     Log( Log_Level::All, Log_Sender::All,  "    State existed for " + diff );
     Log( Log_Level::All, Log_Sender::All,  "    Number of  Errors:  " + fmt::format("{}", Log_Get_N_Errors(state)) );
     Log( Log_Level::All, Log_Sender::All,  "    Number of Warnings: " + fmt::format("{}", Log_Get_N_Warnings(state)) );
+
+    LIKWID_MARKER_CLOSE;
 
     // Delete
     delete(state);

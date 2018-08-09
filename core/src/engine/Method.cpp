@@ -6,6 +6,19 @@
 #include <utility/Exception.hpp>
 #include <utility/Constants.hpp>
 
+#ifdef LIKWID_PERFMON
+#include <likwid.h>
+#else
+##define LIKWID_MARKER_INIT
+##define LIKWID_MARKER_THREADINIT
+##define LIKWID_MARKER_SWITCH
+##define LIKWID_MARKER_REGISTER(regionTag)
+##define LIKWID_MARKER_START(regionTag)
+##define LIKWID_MARKER_STOP(regionTag)
+##define LIKWID_MARKER_CLOSE
+##define LIKWID_MARKER_GET(regionTag, nevents, events, time, count)
+#endif
+
 #include <sstream>
 #include <iomanip>
 
@@ -59,7 +72,12 @@ namespace Engine
 
         //---- Initial save
         this->Save_Current(this->starttime, this->iteration, true, false);
-
+        #pragma omp parallel
+        {
+        
+          Log(Log_Level::Info, Log_Sender::All, std::string("Start LIKWID marker"));
+        LIKWID_MARKER_START(Name().c_str());
+        }
         //---- Iteration loop
         for ( this->iteration = 0; 
               this->ContinueIterating() &&
@@ -96,7 +114,10 @@ namespace Engine
             // Unlock systems
             this->Unlock();
         }
-
+        #pragma omp parallel
+        {
+        LIKWID_MARKER_STOP(Name().c_str());
+        }
         //---- Log messages
         this->Message_End();
 
