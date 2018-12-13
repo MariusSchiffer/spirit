@@ -5,6 +5,7 @@ void Method_Solver<Solver::VP>::Initialize ()
     this->forces_virtual = std::vector<vectorfield>( this->noi, vectorfield( this->nos, {0, 0, 0} ) );
 
     this->configurations_temp  = std::vector<std::shared_ptr<vectorfield>>( this->noi );
+    #pragma omp parallel for if (noi > 4)
     for (int i=0; i<this->noi; i++)
       configurations_temp[i] = std::shared_ptr<vectorfield>(new vectorfield(this->nos));
     
@@ -31,6 +32,7 @@ void Method_Solver<Solver::VP>::Iteration ()
     scalar force_norm2_full = 0;
 
     // Set previous
+    #pragma omp parallel for if (noi > 4)
     for (int i = 0; i < noi; ++i)
     {
         Vectormath::set_c_a(1.0, forces[i],   forces_previous[i]);
@@ -41,6 +43,7 @@ void Method_Solver<Solver::VP>::Iteration ()
     this->Calculate_Force(configurations, forces);
     this->Calculate_Force_Virtual(configurations, forces, forces_virtual);
     
+    #pragma omp parallel for if (noi > 4)
     for (int i = 0; i < noi; ++i)
     {
         auto& velocity      = velocities[i];
@@ -60,6 +63,7 @@ void Method_Solver<Solver::VP>::Iteration ()
         projection_full += projection[i];
         force_norm2_full += force_norm2[i];
     }
+    #pragma omp parallel for if (noi > 4)
     for (int i = 0; i < noi; ++i)
     {
         auto& velocity           = velocities[i];
